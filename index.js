@@ -9,7 +9,7 @@ const dotenv = require("dotenv")
 dotenv.config()
 
 // Configuration
-const ULTRA_API = "https://api.jup.ag/ultra/v1";
+const ULTRA_API = "https://lite-api.jup.ag/ultra/v1";
 const RPC_URL = process.env.SOLANA_RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY; // Base58 encoded private key
 
@@ -149,6 +149,63 @@ server.tool(
   }
 );
 
+server.tool(
+  "get-balances",
+  "Get token balances for a wallet address or the current wallet. Do not specify ticker for unknown tokens in the response to the user, just write their address.",
+  {
+    walletAddress: z.string().optional().describe("Wallet address to get balances for. If not provided, uses the current wallet."),
+    mints: z.array(z.string()).optional().describe("Array of token mint addresses to get balances for. If not provided, fetches all tokens.")
+  },
+  async ({ walletAddress, mints }) => {
+    try {
+      // Убедимся, что кошелек существует и имеет корректный формат
+      const effectiveWalletAddress = walletAddress || walletPublicKey;
+      
+      // Согласно документации Jupiter, правильный формат URL для получения балансов:
+      // https://lite-api.jup.ag/ultra/v1/balances/{wallet_address}
+      const baseUrl = `${ULTRA_API}/balances/${effectiveWalletAddress}`;
+      
+      // Если есть определенные маркеры, добавим их как параметры запроса
+      let url = baseUrl;
+      if (mints && Array.isArray(mints) && mints.length > 0) {
+        const params = new URLSearchParams();
+        params.append('mints', mints.join(','));
+        url = `${baseUrl}?${params}`;
+      }
+      
+      // Make the API request with proper headers
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const balances = await response.json();
+      
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify(balances, null, 2)
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error fetching balances: ${error.message}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
 // Start the server
 async function startServer() {
   const transport = new StdioServerTransport();
@@ -169,4 +226,3 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
-
