@@ -1,0 +1,45 @@
+{
+  "name": "jupiter-mcp",
+  "version": "1.0.1",
+  "description": "MCP Server for Jupiter Protocol - Token swaps, search, portfolio management, and smart error diagnostics on Solana blockchain",
+  "main": "index.js",
+  "homepage": "https://github.com/pipedude/jupiter-mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pipedude/jupiter-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pipedude/jupiter-mcp/issues"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "solana",
+    "jupiter",
+    "mcp",
+    "defi",
+    "swap",
+    "trading", 
+    "blockchain",
+    "cryptocurrency",
+    "model-context-protocol",
+    "token-search",
+    "portfolio-management"
+  ],
+  "author": "pipedude",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.0",
+    "bigint-buffer": "^1.1.5",
+    "dotenv": "^16.4.7",
+    "undici": "^7.5.0",
+    "zod": "^3.24.2"
+  }
+}
